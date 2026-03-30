@@ -931,30 +931,27 @@ async function deleteJob(id: string) {
   );
 }
 type ToolsProps = {
-  expiresAt?: { toMillis: () => number } | null; // Firestore Timestamp-like
+  // Firestore Timestamp-like OR ISO string OR null
+  expiresAt?: { toMillis: () => number } | string | null;
 };
 
 function Tools({ expiresAt }: ToolsProps) {
-  const [activeTool, setActiveTool] = useState<
-    "bio" | "letter" | "invoice" | "profit" | "pitch" | "cv"
-  >("bio");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  let msLeft = 0;
 
-  // Treat as expired only if expiresAt exists and is in the past
-  const expired =
-    expiresAt && typeof expiresAt.toMillis === "function"
-      ? expiresAt.toMillis() < Date.now()
-      : false;
-
-  if (expired) {
-    return (
-      <div className="p-4 border border-red-500 rounded">
-        Your 30‑day access has expired. Please renew to unlock tools.
-      </div>
-    );
+  if (expiresAt) {
+    if (typeof expiresAt === "string") {
+      msLeft = new Date(expiresAt).getTime() - Date.now();
+    } else if (typeof (expiresAt as any).toMillis === "function") {
+      msLeft = (expiresAt as any).toMillis() - Date.now();
+    }
   }
 
+  const isExpired = msLeft <= 0;
+  const daysLeft = Math.max(0, Math.floor(msLeft / (1000 * 60 * 60 * 24)));
+  const hoursLeft = Math.max(
+    0,
+    Math.floor((msLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+  );
 
   // BIO
   const [bioInput, setBioInput] = useState("");
@@ -1026,7 +1023,7 @@ function Tools({ expiresAt }: ToolsProps) {
   }, []);
 
   // countdown
-  const msLeft = expiresAt ? new Date(expiresAt).getTime() - Date.now() : 0;
+  
   const isExpired = msLeft <= 0;
   const daysLeft = Math.max(0, Math.floor(msLeft / (1000 * 60 * 60 * 24)));
   const hoursLeft = Math.max(
