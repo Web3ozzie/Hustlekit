@@ -953,6 +953,10 @@ function Tools({ expiresAt }: ToolsProps) {
     Math.floor((msLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
   );
 
+   const [activeTool, setActiveTool] = useState<
+    "bio" | "letter" | "invoice" | "profit" | "pitch" | "cv"
+  >("bio");
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
