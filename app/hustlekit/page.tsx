@@ -2359,18 +2359,3 @@ function Chat({ myHustleId }: ChatProps) {
     </div>
   );
 }
-async function startToolsSub() {
-  const res = await fetch("/api/flutterwave/subscribe-tools", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ userId: user.id, email: user.email }),
-  });
-
-  const data = await res.json();
-  if (data.link) {
-    window.location.href = data.link; // go to Flutterwave checkout
-  } else {
-    alert("Could not start payment, please try again.");
-  }
-}
-
