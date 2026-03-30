@@ -1,6 +1,7 @@
 "use client";
+export const dynamic = "force-dynamic";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { auth, db, storage } from "../lib/firebase";
 import {
@@ -20,8 +21,9 @@ import {
 import { toast } from "react-hot-toast";
 import jsPDF from "jspdf";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+// plus your Imports for Investments, Jobs, Tools, Chat, Profile
 
-export default function HustleKitPage() {
+function HustleKitInnerPage() {
   const [user, setUser] = useState<{
     uid: string;
     username: string;
@@ -72,34 +74,35 @@ export default function HustleKitPage() {
   }, [tabFromUrl]);
 
   async function startToolsSub() {
-  if (!user?.uid || !user.email) {
-    alert("Please log in with an email account first.");
-    return;
-  }
-
-  try {
-    const res = await fetch("/api/ai/subscribe-tools", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userId: user.uid,
-        email: user.email,
-      }),
-    });
-
-    const data = await res.json();
-    if (!res.ok || !data?.link) {
-      alert(data?.error || "Could not start payment. Please try again.");
+    if (!user?.uid || !user.email) {
+      alert("Please log in with an email account first.");
       return;
     }
 
-    window.location.href = data.link;
-  } catch (err) {
-    console.error(err);
-    alert("Network error. Please try again.");
+    try {
+      const res = await fetch("/api/ai/subscribe-tools", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user.uid,
+          email: user.email,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data?.link) {
+        alert(data?.error || "Could not start payment. Please try again.");
+        return;
+      }
+
+      window.location.href = data.link;
+    } catch (err) {
+      console.error(err);
+      alert("Network error. Please try again.");
+    }
   }
-}
-    return (
+
+  return (
     <div className="min-h-screen bg-black text-white flex flex-col md:flex-row">
       {/* Sidebar */}
       <div className="w-full md:w-64 bg-gray-900 p-4 md:p-5 flex md:block overflow-x-auto md:overflow-visible">
@@ -191,6 +194,13 @@ export default function HustleKitPage() {
   );
 }
 
+export default function HustleKitPage() {
+  return (
+    <Suspense fallback={<div className="text-xs text-gray-400 p-4">Loading...</div>}>
+      <HustleKitInnerPage />
+    </Suspense>
+  );
+}
 type InvestmentsProps = {
   myHustleId?: string;
   openChatTab?: () => void;
