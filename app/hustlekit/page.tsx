@@ -209,6 +209,10 @@ function HustleKitInnerPage() {
     </div>
   );
 }
+type InvestmentsProps = {
+  myHustleId?: string;
+  openChatTab?: () => void;
+};
 function Investments({ myHustleId, openChatTab }: InvestmentsProps) {
   const [coins, setCoins] = React.useState<any[]>([]);
   const [category, setCategory] = React.useState("crypto");
@@ -1783,7 +1787,9 @@ function Tools({ expiresAt }: ToolsProps) {
     </div>
   );
 }
-
+type ProfileProps = {
+  user: { username: string; hustleId: string; email: string | null; hasToolsSub?: boolean };
+};
 function Profile({ user }: ProfileProps) {
   const [profileName, setProfileName] = useState(user.username);
   const [profileId, setProfileId] = useState(user.hustleId);
