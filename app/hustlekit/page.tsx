@@ -76,30 +76,22 @@ async function startToolsSub() {
     return;
   }
 
-  try {
-    const res = await fetch("/api/ai/subscribe-tools", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userId: user.uid,
-        email: user.email,
-      }),
-    });
+  const res = await fetch("/api/ai/subscribe-tools", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      userId: user.uid,
+      email: user.email,
+    }),
+  });
 
-    let data: any = null;
-    try {
-      data = await res.json();
-    } catch {
-      console.error("Response not JSON");
-    }
+  const data = await res.json();
+  if (!res.ok || !data?.link) {
+    alert(data?.error || "Could not start payment. Please try again.");
+    return;
+  }
 
-    console.log("SUBSCRIBE RES:", res.status, data);
-
-   if (!res.ok || !data?.link) {
-  alert(data?.error || "Could not start payment. Please try again.");
-  return;
-}
-    window.location.href = data.link;
+  window.location.href = data.link;
   } catch (err) {
     console.error(err);
     alert("Network error. Please try again.");
