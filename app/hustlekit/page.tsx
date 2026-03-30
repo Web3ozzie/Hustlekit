@@ -18,6 +18,7 @@ import {
   where,
 } from "firebase/firestore";
 import { toast } from "react-hot-toast";
+import jsPDF from "jspdf";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export default function HustleKitPage() {
