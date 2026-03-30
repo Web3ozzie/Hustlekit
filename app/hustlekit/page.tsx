@@ -72,34 +72,33 @@ export default function HustleKitPage() {
   }, [tabFromUrl]);
 
   async function startToolsSub() {
-    if (!user?.uid || !user.email) {
-      alert("Please log in with an email account first.");
+  if (!user?.uid || !user.email) {
+    alert("Please log in with an email account first.");
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/ai/subscribe-tools", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: user.uid,
+        email: user.email,
+      }),
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data?.link) {
+      alert(data?.error || "Could not start payment. Please try again.");
       return;
     }
 
-    try {
-      const res = await fetch("/api/ai/subscribe-tools", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: user.uid,
-          email: user.email,
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok || !data?.link) {
-        alert(data?.error || "Could not start payment. Please try again.");
-        return;
-      }
-
-      window.location.href = data.link;
-    } catch (err) {
-      console.error(err);
-      alert("Network error. Please try again.");
-    }
+    window.location.href = data.link;
+  } catch (err) {
+    console.error(err);
+    alert("Network error. Please try again.");
   }
-
+}
     return (
     <div className="min-h-screen bg-black text-white flex flex-col md:flex-row">
       {/* Sidebar */}
