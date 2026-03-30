@@ -953,6 +953,9 @@ function Tools({ expiresAt }: ToolsProps) {
     Math.floor((msLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
   );
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
   // BIO
   const [bioInput, setBioInput] = useState("");
   const [generatedBio, setGeneratedBio] = useState("");
@@ -1022,7 +1025,7 @@ function Tools({ expiresAt }: ToolsProps) {
     if (savedPitch) setOutput(savedPitch);
   }, []);
 
-  
+
   async function callAI(tool: string, payload: any) {
     try {
       setLoading(true);
